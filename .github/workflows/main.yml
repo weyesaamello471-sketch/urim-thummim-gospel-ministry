@@ -34,15 +34,12 @@ jobs:
 
       - name: Configure Bubblewrap
         run: |
-          mkdir -p "$HOME/.bubblewrap"
-          echo "jdkPath=$JAVA_HOME" > "$HOME/.bubblewrap/config"
+          printf "n\n" | bubblewrap updateConfig --jdkPath="$JAVA_HOME" || true
 
       - name: Validate PWA
-        env:
-          CI: true
         run: |
-          bubblewrap validate \
+          printf "n\n" | bubblewrap validate \
             --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
 
-      - name: Finish
+      - name: Success
         run: echo "PWA validation completed successfully"
