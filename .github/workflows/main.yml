@@ -11,32 +11,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Check Java
+      - name: Verify Java
         run: |
           java -version
           echo "JAVA_HOME=$JAVA_HOME"
 
       - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Configure Bubblewrap JDK
         run: |
-          bubblewrap updateConfig --jdkPath="$JAVA_HOME"
+          npm install -g @bubblewrap/cli
+          bubblewrap --version
 
-      - name: Check PWA
+      - name: Configure Bubblewrap
         run: |
-          bubblewrap validate --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
+          mkdir -p "$HOME/.bubblewrap"
+          echo "jdkPath=$JAVA_HOME" > "$HOME/.bubblewrap/config"
 
-      - name: Show result
-        run: echo "PWA validation completed"
+      - name: Validate PWA
+        env:
+          CI: true
+        run: |
+          bubblewrap validate \
+            --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
+
+      - name: Finish
+        run: echo "PWA validation completed successfully"
