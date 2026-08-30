@@ -1,1 +1,26 @@
+name: Build Urim Thummim Android APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Check PWA
+        run: bubblewrap validate --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
+
+      - name: Show result
+        run: echo "PWA validation completed"
