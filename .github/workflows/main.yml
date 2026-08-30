@@ -22,11 +22,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Check Java
+        run: |
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
+      - name: Configure Bubblewrap JDK
+        run: |
+          bubblewrap updateConfig --jdkPath="$JAVA_HOME"
+
       - name: Check PWA
-        run: bubblewrap validate --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
+        run: |
+          bubblewrap validate --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
 
       - name: Show result
         run: echo "PWA validation completed"
