@@ -22,31 +22,40 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Configure Android SDK
+      - name: Install Android SDK components
         run: |
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          test -d "$ANDROID_SDK_ROOT"
-
-      - name: Configure Bubblewrap
-        run: |
-          mkdir -p "$HOME/.bubblewrap"
-
-          cat > "$HOME/.bubblewrap/config.json" <<EOF
-          {
-            "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_SDK_ROOT"
-          }
-          EOF
-
-          cat "$HOME/.bubblewrap/config.json"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install Bubblewrap
         run: |
           npm install -g @bubblewrap/cli
           bubblewrap --version
 
-      - name: Verify Bubblewrap configuration
+      - name: Configure Bubblewrap
+        run: |
+          mkdir -p "$HOME/.bubblewrap"
+
+          bubblewrap updateConfig \
+            --jdkPath="$JAVA_HOME" \
+            --androidSdkPath="$ANDROID_SDK_ROOT"
+
+          echo "Bubblewrap config:"
+          cat "$HOME/.bubblewrap/config.json"
+
+      - name: Verify Android SDK
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+
+          test -d "$ANDROID_SDK_ROOT"
+          test -d "$ANDROID_SDK_ROOT/build-tools"
+          test -d "$ANDROID_SDK_ROOT/platform-tools"
+          test -d "$ANDROID_SDK_ROOT/platforms"
+
+          ls -la "$ANDROID_SDK_ROOT"
+
+      - name: Bubblewrap Doctor
         run: |
           bubblewrap doctor
 
@@ -56,4 +65,6 @@ jobs:
             --url=https://weyesaamello471-sketch.github.io/urim-thummim-gospel-ministry/
 
       - name: Success
-        run: echo "PWA validation completed successfully"
+        run: |
+          echo "Bubblewrap and Android SDK are configured successfully."
+          echo "PWA validation completed successfully."
