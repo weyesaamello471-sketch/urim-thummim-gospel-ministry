@@ -1,0 +1,47 @@
+name: Build Urim Thummim Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
+
+      - name: Install Bubblewrap
+        run: |
+          npm install -g @bubblewrap/cli
+
+      - name: Build APK from Website
+        run: |
+          bubblewrap build
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Urim-Thummim-Android-APK
+          path: |
+            *.apk
+            app-release.apk
+            app/build/outputs/**/*.apk
+          if-no-files-found: warn
